@@ -6,9 +6,10 @@ LABEL maintainer="Sebastian Ramirez <tiangolo@gmail.com>"
 ENV NGINX_VERSION nginx-1.23.2
 ENV NGINX_RTMP_MODULE_VERSION 1.2.2
 
-# Install dependencies
+# Install Nginx dependencies and ffmpeg
 RUN apt-get update && \
     apt-get install -y ca-certificates openssl libssl-dev && \
+    apt-get install -y ffmpeg && \
     rm -rf /var/lib/apt/lists/*
 
 # Download and decompress Nginx
@@ -52,5 +53,11 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log && \
 # Set up config file
 COPY nginx.conf /etc/nginx/nginx.conf
 
+COPY stat.xsl /usr/local/nginx/html/stat.xsl
+
 EXPOSE 1935
+EXPOSE 8080
+
+RUN mkdir -p /usr/local/nginx/html/stream/dash
+
 CMD ["nginx", "-g", "daemon off;"]
